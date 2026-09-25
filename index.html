@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reseller Panel — Joshua Baraka Tickets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f7f7f8; --panel: #ffffff; --text: #111111; --text-soft: #6b7280;
+    --border: #e5e7eb; --primary: #111111; --primary-dark: #000000;
+    --success: #10b981; --danger: #ef4444; --warn: #f59e0b;
+    --sale: #dc2626; --whatsapp: #25D366; --accent: #6366f1;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.05);
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  h1, h2, h3 { font-family: 'Heebo', sans-serif; font-weight: 700; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  input, select { font-family: inherit; }
+  a { color: inherit; text-decoration: none; }
+  .app { display: flex; min-height: 100vh; flex-direction: column; }
+  .topbar { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .topbar-inner { max-width: 1200px; margin: 0 auto; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 0.75rem; font-family: 'Heebo', sans-serif; font-weight: 800; font-size: 1.125rem; }
+  .brand-mark { width: 2.25rem; height: 2.25rem; border-radius: 0.5rem; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  .brand-sub { font-size: 0.75rem; color: var(--text-soft); font-weight: 500; }
+  .restock-btn-top { background: var(--primary); color: #fff; padding: 0.625rem 1rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.375rem; transition: all .2s; }
+  .restock-btn-top:hover { background: var(--primary-dark); }
+  .main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.25rem; width: 100%; flex: 1; }
+
+  .tabs-bar { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 65px; z-index: 90; }
+  .tabs-inner { max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; display: flex; gap: 0.25rem; overflow-x: auto; }
+  .tab-btn { padding: 1rem 1.125rem; font-size: 0.8125rem; font-weight: 700; color: var(--text-soft); border-bottom: 2px solid transparent; transition: all .2s; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+
+  .oos-banner { display: none; background: #fef2f2; border: 2px solid #fecaca; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.5rem; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .oos-banner.active { display: flex; }
+  .oos-icon { flex-shrink: 0; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: #fee2e2; color: #b91c1c; display: flex; align-items: center; justify-content: center; }
+  .oos-text { flex: 1; min-width: 200px; }
+  .oos-title { font-family: 'Heebo', sans-serif; font-size: 1rem; font-weight: 800; color: #991b1b; margin-bottom: 0.125rem; }
+  .oos-sub { font-size: 0.8125rem; color: #7f1d1d; }
+  .oos-btn { background: var(--primary); color: #fff; padding: 0.75rem 1.25rem; border-radius: 999px; font-size: 0.875rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; transition: all .2s; white-space: nowrap; }
+  .oos-btn:hover { background: var(--primary-dark); }
+
+  .pending-banner { display: none; background: #fffbeb; border: 2px solid #fde68a; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.5rem; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .pending-banner.active { display: flex; }
+  .pending-icon { flex-shrink: 0; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: #fef3c7; color: #92400e; display: flex; align-items: center; justify-content: center; }
+  .pending-text { flex: 1; min-width: 200px; }
+  .pending-title { font-family: 'Heebo', sans-serif; font-size: 1rem; font-weight: 800; color: #92400e; margin-bottom: 0.125rem; }
+  .pending-sub { font-size: 0.8125rem; color: #78350f; }
+
+  .stock-section { margin-bottom: 1.5rem; }
+  .section-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; }
+  .section-title .live-mini { font-size: 0.625rem; color: var(--success); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; }
+  .section-title .live-mini::before { content: ''; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: var(--success); animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .stock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.875rem; }
+  .stock-tile { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+  .stock-tile .tier-name { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin-bottom: 0.5rem; }
+  .stock-tile .stock-big { font-family: 'Heebo', sans-serif; font-size: 2.25rem; font-weight: 800; line-height: 1; color: var(--text); }
+  .stock-tile .stock-label { font-size: 0.75rem; color: var(--text-soft); margin-top: 0.25rem; }
+  .stock-tile.low { border-color: #fecaca; background: #fff5f5; }
+  .stock-tile.low .stock-big { color: var(--sale); }
+  .stock-tile.out { border-color: #fecaca; background: #fef2f2; }
+  .stock-tile.out .stock-big { color: var(--sale); }
+  .stock-tile .stock-badge { position: absolute; top: 0.75rem; right: 0.75rem; font-size: 0.625rem; font-weight: 800; letter-spacing: 0.05em; padding: 0.25rem 0.5rem; border-radius: 999px; }
+  .stock-tile.low .stock-badge { background: #fee2e2; color: #991b1b; }
+  .stock-tile.out .stock-badge { background: var(--sale); color: #fff; }
+  .stock-tile.ok .stock-badge { background: #d1fae5; color: #065f46; }
+
+  .toolbar { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.875rem; }
+  .toolbar input, .toolbar select { border: 2px solid var(--border); border-radius: 999px; padding: 0.625rem 1rem; font-size: 0.875rem; outline: none; transition: all .2s; background: #fff; }
+  .toolbar input:focus, .toolbar select:focus { border-color: var(--primary); }
+  .toolbar .search { flex: 1; min-width: 200px; }
+  .btn { border-radius: 999px; padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 600; transition: all .2s; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center; }
+  .btn-ghost { background: #fff; border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { background: var(--bg-soft); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-whatsapp { background: var(--whatsapp); color: #fff; }
+  .btn-whatsapp:hover { background: #1ebe5b; }
+  .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  thead th { background: var(--bg-soft); text-align: left; padding: 0.875rem 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-soft); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody td { padding: 0.875rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+  .cell-name { font-weight: 600; }
+  .cell-sub { font-size: 0.75rem; color: var(--text-soft); margin-top: 0.125rem; }
+  .cell-code { font-family: 'Heebo', monospace; font-weight: 700; font-size: 0.8125rem; background: var(--bg-soft); padding: 0.25rem 0.5rem; border-radius: 6px; }
+  .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .badge-tier { background: #e0e7ff; color: #3730a3; }
+  .badge-used { background: #f3f4f6; color: #6b7280; }
+  .badge-unused { background: #d1fae5; color: #065f46; }
+  .badge-pending { background: #fef3c7; color: #92400e; }
+
+  .empty { text-align: center; padding: 3rem 1.5rem; color: var(--text-soft); }
+  .loading { text-align: center; padding: 3rem; color: var(--text-soft); }
+  .spinner { width: 2rem; height: 2rem; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-backdrop.active { display: flex; }
+  .modal { background: #fff; border-radius: 20px; max-width: 30rem; width: 100%; padding: 1.75rem; position: relative; box-shadow: 0 24px 80px rgba(0,0,0,0.35); text-align: center; max-height: calc(100vh - 2rem); overflow-y: auto; }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-soft); }
+  .modal-close:hover { background: var(--bg-soft); }
+  .modal h3 { font-size: 1.125rem; margin-bottom: 0.25rem; }
+  .modal .modal-sub { font-size: 0.8125rem; color: var(--text-soft); margin-bottom: 1rem; }
+  .modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .modal-actions .btn { flex: 1; min-width: 120px; }
+
+  .restock-icon { width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #ede9fe; color: #5b21b6; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+  .step-hint { font-size: 0.75rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 0.5rem; text-align: left; margin-top: 1rem; }
+  .tier-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem; margin-bottom: 0.5rem; }
+  .tier-option { border: 2px solid var(--border); background: #fff; padding: 0.875rem 0.5rem; border-radius: var(--radius); cursor: pointer; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: 0.375rem; text-align: center; }
+  .tier-option:hover { border-color: var(--text); }
+  .tier-option.selected { border-color: var(--text); background: var(--bg-soft); box-shadow: 0 0 0 3px rgba(17,17,17,0.08); }
+  .tier-option .t-name { font-weight: 700; font-size: 0.8125rem; }
+  .tier-option .t-price { font-size: 0.6875rem; color: var(--text-soft); font-weight: 600; }
+  .pay-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+  .pay-option { border: 2px solid var(--border); background: #fff; padding: 0.875rem 0.75rem; border-radius: var(--radius); cursor: pointer; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; position: relative; }
+  .pay-option:hover { border-color: var(--text); }
+  .pay-option.selected { border-color: var(--text); background: var(--bg-soft); box-shadow: 0 0 0 3px rgba(17,17,17,0.08); }
+  .pay-logo { width: 2.5rem; height: 2.5rem; border-radius: 0.625rem; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; font-family: 'Heebo', sans-serif; }
+  .pay-logo.airtel { background: #e30613; color: #fff; }
+  .pay-logo.mtn { background: #ffcb05; color: #000; }
+  .pay-option .name { font-size: 0.8125rem; font-weight: 600; }
+  .closed-notice { background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.8125rem; color: #7f1d1d; text-align: left; margin-bottom: 1rem; display: none; }
+  .closed-notice.active { display: block; }
+  .closed-notice strong { color: #991b1b; }
+  .number-box { border: 2.5px solid var(--text); background: #fff; border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; position: relative; text-align: center; display: none; }
+  .number-box.active { display: block; }
+  .number-display { font-family: 'Heebo', sans-serif; font-size: 2rem; font-weight: 800; color: var(--text); letter-spacing: 0.06em; line-height: 1.1; margin: 0.25rem 0 0.5rem; }
+  .number-amount { font-size: 0.75rem; color: var(--text-soft); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+  .number-amount-value { font-family: 'Heebo', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--sale); line-height: 1.1; margin-bottom: 0.875rem; }
+  .copy-btn { width: 100%; background: var(--text); color: #fff; padding: 0.75rem 1rem; border-radius: 999px; font-size: 0.875rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all .2s; }
+  .copy-btn:hover { background: var(--primary-dark); }
+  .qty-box { display: flex; align-items: center; justify-content: center; gap: 1.25rem; padding: 0.5rem 0 1rem; }
+  .qty-btn { width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 2px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; color: var(--text); transition: all .2s; }
+  .qty-btn:hover:not(:disabled) { border-color: var(--text); background: var(--bg-soft); }
+  .qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .qty-value { font-family: 'Heebo', sans-serif; font-size: 2.25rem; font-weight: 800; color: var(--text); min-width: 3.5rem; text-align: center; line-height: 1; }
+  .txn-box { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; text-align: left; display: none; }
+  .txn-box.active { display: block; }
+  .txn-box label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-soft); margin-bottom: 0.5rem; }
+  .txn-input { width: 100%; border: 2px solid var(--border); border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.9375rem; font-family: 'Heebo', monospace; letter-spacing: 0.05em; outline: none; transition: all .2s; background: #fff; }
+  .txn-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(17,17,17,0.08); }
+  .txn-hint { font-size: 0.6875rem; color: var(--text-soft); margin-top: 0.5rem; line-height: 1.5; }
+  .success-block { display: none; text-align: center; }
+  .success-block.active { display: block; }
+  .success-icon { width: 4rem; height: 4rem; border-radius: 50%; background: rgba(16,185,129,0.12); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: #fff; padding: 0.875rem 1.25rem; border-radius: 999px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 10px 40px rgba(0,0,0,0.25); z-index: 2000; opacity: 0; transition: all .3s; display: flex; align-items: center; gap: 0.5rem; max-width: 90vw; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .qr-wrap { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; display: inline-block; margin: 0.5rem 0 1rem; }
+  .qr-wrap canvas { display: block; }
+
+  .tickets-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; }
+  .ticket-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; box-shadow: var(--shadow); }
+  .ticket-card .tc-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+  .ticket-card .tc-code { font-family: 'Heebo', monospace; font-weight: 800; font-size: 0.875rem; background: var(--bg-soft); padding: 0.25rem 0.5rem; border-radius: 6px; }
+  .ticket-card .tc-tier { font-size: 0.6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.1875rem 0.5rem; border-radius: 999px; background: #e0e7ff; color: #3730a3; }
+  .ticket-card .tc-holder { font-weight: 700; font-size: 0.9375rem; margin-bottom: 0.125rem; }
+  .ticket-card .tc-sub { font-size: 0.75rem; color: var(--text-soft); margin-bottom: 0.75rem; }
+  .ticket-card .tc-actions { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+  .ticket-card .tc-actions .btn { flex: 1; min-width: 100px; padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+
+  @media (max-width: 640px) {
+    .main { padding: 1rem; }
+    .topbar-inner { padding: 1rem; }
+    .tabs-inner { padding: 0 1rem; }
+    .tier-options { grid-template-columns: 1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">Q</div>
+        <div>
+          <div>Reseller Panel</div>
+          <div class="brand-sub">Joshua Baraka · Mbarara</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="restock-btn-top" id="restockTopBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add stock
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs-bar">
+    <div class="tabs-inner">
+      <button class="tab-btn active" data-tab="home">Home</button>
+      <button class="tab-btn" data-tab="tickets">Generate tickets</button>
+      <button class="tab-btn" data-tab="generated">Generated</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- HOME -->
+    <div class="tab-pane" id="pane-home">
+      <div class="oos-banner" id="oosBanner">
+        <div class="oos-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="oos-text">
+          <div class="oos-title">You are out of stock!</div>
+          <div class="oos-sub">Add stock to continue selling.</div>
+        </div>
+        <button class="oos-btn" id="oosRestockBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add stock
+        </button>
+      </div>
+
+      <div class="pending-banner" id="pendingBanner">
+        <div class="pending-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="pending-text">
+          <div class="pending-title" id="pendingTitle">Stock request pending approval</div>
+          <div class="pending-sub" id="pendingSub">—</div>
+        </div>
+      </div>
+
+      <div class="stock-section">
+        <div class="section-title">
+          <span>Your stock</span>
+          <span class="live-mini">Live</span>
+        </div>
+        <div class="stock-grid" id="stockGrid">
+          <div class="loading" style="grid-column: 1/-1;"><div class="spinner"></div>Loading stock…</div>
+        </div>
+      </div>
+
+      <div class="stock-section">
+        <div class="section-title">
+          <span>Your customers</span>
+          <span class="live-mini">Live</span>
+        </div>
+        <div class="toolbar">
+          <input class="search" type="search" id="custSearch" placeholder="Search name, WhatsApp, code…" />
+          <select id="filterTier">
+            <option value="">All tickets</option>
+            <option value="Regular">Regular</option>
+            <option value="VIP">VIP</option>
+            <option value="VVIP / Table">VVIP / Table</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Ticket</th>
+                  <th>Qty</th>
+                  <th>Paid</th>
+                  <th>QR status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="custTbody">
+                <tr><td colspan="7" class="loading"><div class="spinner"></div>Loading customers…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERATE TICKETS -->
+    <div class="tab-pane" id="pane-tickets" style="display:none;">
+      <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; box-shadow:var(--shadow);">
+        <h3 style="margin-bottom:0.5rem;">Generate tickets</h3>
+        <p style="font-size:0.8125rem; color:var(--text-soft); margin-bottom:1.25rem;">
+          Pick a ticket type and how many. Each ticket gets its own link — send it on WhatsApp or open it to print / save as PDF.
+        </p>
+
+        <div class="step-hint">1. Ticket type</div>
+        <div class="tier-options" id="genTierOptions">
+          <button class="tier-option" data-tier="Regular" type="button">
+            <span class="t-name">Regular</span>
+            <span class="t-price">USh30,000</span>
+          </button>
+          <button class="tier-option" data-tier="VIP" type="button">
+            <span class="t-name">VIP</span>
+            <span class="t-price">USh70,000</span>
+          </button>
+          <button class="tier-option" data-tier="VVIP / Table" type="button">
+            <span class="t-name">VVIP</span>
+            <span class="t-price">USh1,000,000</span>
+          </button>
+        </div>
+
+        <div class="step-hint">2. How many tickets?</div>
+        <div class="qty-box">
+          <button class="qty-btn" id="genQtyMinus" type="button">−</button>
+          <div class="qty-value" id="genQtyValue">1</div>
+          <button class="qty-btn" id="genQtyPlus" type="button">+</button>
+        </div>
+
+        <div class="step-hint">3. Holder name (optional)</div>
+        <input type="text" id="genHolder" class="txn-input" placeholder="e.g. Aryatuha Alvin" style="margin-bottom:1rem;" />
+
+        <button class="btn btn-primary" id="genBtn" style="width:100%;" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Generate tickets
+        </button>
+
+        <p style="font-size:0.6875rem; color:var(--text-soft); margin-top:0.875rem; text-align:center;">
+          Tickets are saved to <code>tickets</code> collection. You can re-open and re-send them any time.
+        </p>
+      </div>
+    </div>
+
+    <!-- GENERATED TICKETS -->
+    <div class="tab-pane" id="pane-generated" style="display:none;">
+      <div class="toolbar">
+        <input class="search" type="search" id="genSearch" placeholder="Search holder, code, tier…" />
+        <select id="genFilterTier">
+          <option value="">All tiers</option>
+          <option value="Regular">Regular</option>
+          <option value="VIP">VIP</option>
+          <option value="VVIP / Table">VVIP / Table</option>
+        </select>
+      </div>
+
+      <div id="genWrap">
+        <div class="loading"><div class="spinner"></div>Loading tickets…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD STOCK MODAL -->
+<div class="modal-backdrop" id="restockModal">
+  <div class="modal">
+    <button class="modal-close" id="restockClose">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+
+    <div id="restockStep1">
+      <div class="restock-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <h3>Add stock</h3>
+      <p class="modal-sub">Choose ticket type and quantity</p>
+
+      <div class="step-hint">1. Ticket type</div>
+      <div class="tier-options" id="tierOptions">
+        <button class="tier-option" data-tier="regular" type="button">
+          <span class="t-name">Regular</span>
+          <span class="t-price">USh17,000</span>
+        </button>
+        <button class="tier-option" data-tier="vip" type="button">
+          <span class="t-name">VIP</span>
+          <span class="t-price">USh50,000</span>
+        </button>
+        <button class="tier-option" data-tier="vvip" type="button">
+          <span class="t-name">VVIP</span>
+          <span class="t-price">USh850,000</span>
+        </button>
+      </div>
+
+      <div id="qtySection" style="display:none;">
+        <div class="step-hint">2. How many tickets?</div>
+        <div class="qty-box">
+          <button class="qty-btn" id="qtyMinus" type="button">−</button>
+          <div class="qty-value" id="qtyValue">1</div>
+          <button class="qty-btn" id="qtyPlus" type="button">+</button>
+        </div>
+      </div>
+
+      <div id="paySection" style="display:none;">
+        <div class="step-hint">3. Pay with</div>
+        <div class="pay-options">
+          <button class="pay-option" data-method="airtel" type="button">
+            <div class="pay-logo airtel">Airtel</div>
+            <div class="name">Airtel Money</div>
+          </button>
+          <button class="pay-option" data-method="mtn" type="button">
+            <div class="pay-logo mtn">MTN</div>
+            <div class="name">MTN MoMo</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="closed-notice" id="mtnDownNotice">
+        <strong>MTN MoMo is temporarily down.</strong> Please use Airtel Money to restock.
+      </div>
+
+      <div class="number-box" id="numberBox">
+        <div style="font-size:0.625rem; font-weight:800; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-soft); margin-bottom:0.5rem;">Send money to</div>
+        <div class="number-display" id="payTillNumber">—</div>
+        <div style="font-family:'Heebo',sans-serif; font-size:1.25rem; font-weight:800; color:var(--accent); margin-bottom:0.5rem;" id="payTillOwner">—</div>
+        <div style="font-size:0.8125rem; color:var(--text-soft); font-weight:700; margin-bottom:0.875rem;" id="payTillPhone">—</div>
+        <div class="number-amount">Amount to send</div>
+        <div class="number-amount-value" id="amountDisplay">—</div>
+        <button class="copy-btn" id="copyNumberBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          Copy till number
+        </button>
+      </div>
+
+      <div class="ussd-steps" id="restockUssdSteps" style="display:none; background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:12px; padding:1rem 1.125rem; margin-bottom:1rem; text-align:left;">
+        <div style="font-family:'Heebo',sans-serif; font-size:0.8125rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:#1e3a8a; margin-bottom:0.75rem;">How to pay with Airtel Money</div>
+        <ol id="restockUssdList" style="list-style:none; display:flex; flex-direction:column; gap:0.625rem;"></ol>
+        <div style="background:#fff; border:1px dashed #1e40af; border-radius:8px; padding:0.625rem 0.75rem; margin-top:0.75rem; font-size:0.8125rem; color:#1e3a8a;">
+          ✅ You will receive an SMS with your <strong>transaction ID</strong>. Paste it below.
+        </div>
+      </div>
+
+      <div class="txn-box" id="txnBox">
+        <label for="txnInput">Transaction ID</label>
+        <input type="text" id="txnInput" class="txn-input" placeholder="e.g. MP240926.1234.A56789" autocomplete="off" spellcheck="false" />
+        <div class="txn-hint">Paste the confirmation code from the Airtel SMS you received.</div>
+      </div>
+
+      <div class="modal-actions" id="restockActions" style="display:none;">
+        <button class="btn btn-ghost" id="restockCancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="submitRestockBtn">Submit payment</button>
+      </div>
+    </div>
+
+    <div id="restockStep2" class="success-block">
+      <div class="success-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h3>Payment submitted</h3>
+      <p class="modal-sub" style="margin-bottom:1.5rem;">
+        Your payment is <strong>pending approval</strong>. Once approved, your stock will increase automatically.
+      </p>
+      <div style="background:var(--bg-soft); border:1px solid var(--border); border-radius:12px; padding:1rem; text-align:left; font-size:0.8125rem;">
+        <div style="display:flex; justify-content:space-between; padding:0.25rem 0;"><span style="color:var(--text-soft);">Ticket type</span><span style="font-weight:700;" id="successTier">—</span></div>
+        <div style="display:flex; justify-content:space-between; padding:0.25rem 0;"><span style="color:var(--text-soft);">Quantity</span><span style="font-weight:700;" id="successQty">—</span></div>
+        <div style="display:flex; justify-content:space-between; padding:0.25rem 0;"><span style="color:var(--text-soft);">Paid to</span><span style="font-weight:700;" id="successOwner">—</span></div>
+        <div style="display:flex; justify-content:space-between; padding:0.25rem 0;"><span style="color:var(--text-soft);">Amount</span><span style="font-weight:700;" id="successAmount">—</span></div>
+        <div style="display:flex; justify-content:space-between; padding:0.25rem 0;"><span style="color:var(--text-soft);">Transaction ID</span><span style="font-weight:700; font-family:'Heebo',monospace;" id="successTxn">—</span></div>
+      </div>
+      <button class="btn btn-primary" id="restockDoneBtn" style="width:100%; margin-top:1rem;">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="modal-backdrop" id="qrModal">
+  <div class="modal">
+    <button class="modal-close" id="qrClose">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <h3 id="qrTitle">Ticket QR</h3>
+    <p class="modal-sub" id="qrSub">—</p>
+    <div class="qr-wrap"><canvas id="qrCanvas"></canvas></div>
+    <div style="font-family:'Heebo',monospace; font-weight:800; font-size:1rem; margin-bottom:0.5rem;" id="qrCodeText">—</div>
+    <p style="font-size:0.75rem; color:var(--text-soft);" id="qrBuyerInfo">—</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="qrDownloadBtn">Download PNG</button>
+      <button class="btn btn-whatsapp" id="qrWhatsAppBtn">Send on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg">Done</span></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+<script>
+/* ============ CONFIG ============ */
+const RESELLER = {
+  name: 'Aryatuha Alvin',
+  phone: '0704483899'
+};
+
+const SUPPLIER = {
+  airtel: {
+    till:  '7224822',
+    owner: 'SYRAS Baraka Nkore Show',
+    phone: '0749248310',
+    steps: [
+      'Dial <span style="background:#dbeafe; color:#1e3a8a; font-family:Heebo,monospace; font-weight:800; font-size:0.875rem; padding:0.125rem 0.4375rem; border-radius:6px;">*185*9#</span> on your Airtel phone.',
+      'Select <strong>Pay Bill</strong>.',
+      'Enter merchant / till number: <span style="background:#dbeafe; color:#1e3a8a; font-family:Heebo,monospace; font-weight:800; font-size:0.875rem; padding:0.125rem 0.4375rem; border-radius:6px;">7224822</span>',
+      'Enter amount: <strong id="instrAmount">—</strong>',
+      'Enter your Airtel Money PIN to confirm.'
+    ]
+  }
+};
+
+const TICKET_BASE_URL = 'ticket.html';
+
+const LOW_STOCK_THRESHOLD = 10;
+const MAX_QTY = 200;
+const MAX_GEN_QTY = 200;
+
+/* Wholesale prices the reseller pays */
+const TIER_PRICES = { regular: 17000, vip: 50000, vvip: 850000 };
+const TIER_LABELS = { regular: 'Regular', vip: 'VIP', vvip: 'VVIP / Table' };
+
+/* ============ FIREBASE ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDpctifaksxZFoymFMPmkqxNfy2HOiKubg",
+  authDomain: "baracktickets.firebaseapp.com",
+  projectId: "baracktickets",
+  storageBucket: "baracktickets.firebasestorage.app",
+  messagingSenderId: "209541227277",
+  appId: "1:209541227277:web:d267fd2a3f07f968724644",
+  measurementId: "G-0NBP5Y8329"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const FV = firebase.firestore.FieldValue;
+
+/* ============ HELPERS ============ */
+function formatUGX(n) { return 'USh' + Number(n || 0).toLocaleString('en-UG'); }
+function normalizePhone(p) {
+  let s = String(p || '').replace(/[^\d+]/g, '');
+  if (s.startsWith('0')) s = '+256' + s.slice(1);
+  if (s.startsWith('256') && !s.startsWith('+')) s = '+' + s;
+  return s;
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function generateTicketCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 8; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return 'JB-' + s;
+}
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-pane').forEach(p => {
+      p.style.display = p.id === 'pane-' + btn.dataset.tab ? 'block' : 'none';
+    });
+    if (btn.dataset.tab === 'generated') loadGeneratedTickets();
+  });
+});
+
+/* ============ STOCK (LIVE) ============ */
+let stockUnsub = null;
+function watchStock() {
+  const grid = document.getElementById('stockGrid');
+  if (stockUnsub) stockUnsub();
+  stockUnsub = db.collection('resellerStock').doc(RESELLER.phone).onSnapshot(doc => {
+    const d = doc.exists ? doc.data() : {};
+    const alloc = d.allocated || { regular: 0, vip: 0, vvip: 0 };
+    const sold  = d.sold      || { regular: 0, vip: 0, vvip: 0 };
+    const remaining = {
+      regular: Math.max(0, (Number(alloc.regular) || 0) - (Number(sold.regular) || 0)),
+      vip:     Math.max(0, (Number(alloc.vip)     || 0) - (Number(sold.vip)     || 0)),
+      vvip:    Math.max(0, (Number(alloc.vvip)    || 0) - (Number(sold.vvip)    || 0))
+    };
+    const totalRemaining = remaining.regular + remaining.vip + remaining.vvip;
+    const tiers = [
+      { key: 'regular', label: 'Regular' },
+      { key: 'vip',     label: 'VIP' },
+      { key: 'vvip',    label: 'VVIP / Table' }
+    ];
+    grid.innerHTML = tiers.map(t => {
+      const left = remaining[t.key];
+      const cls = left === 0 ? 'out' : (left <= LOW_STOCK_THRESHOLD ? 'low' : 'ok');
+      const badge = left === 0 ? 'OUT' : (left <= LOW_STOCK_THRESHOLD ? 'LOW' : 'OK');
+      return `
+        <div class="stock-tile ${cls}">
+          <div class="stock-badge">${badge}</div>
+          <div class="tier-name">${t.label}</div>
+          <div class="stock-big">${left}</div>
+          <div class="stock-label">tickets left</div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('oosBanner').classList.toggle('active', totalRemaining <= 0);
+  }, err => {
+    console.error('stock listener error', err);
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">Could not load stock.</div>`;
+  });
+}
+
+/* ============ PENDING PURCHASES (LIVE) ============ */
+function watchPendingPurchases() {
+  db.collection('stockPurchases')
+    .where('resellerPhone', '==', RESELLER.phone)
+    .orderBy('ts', 'desc')
+    .limit(5)
+    .onSnapshot(snap => {
+      const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pending  = rows.filter(r => r.status === 'pending');
+      const rejected = rows.filter(r => r.status === 'rejected' && !r.seenByReseller);
+      const banner = document.getElementById('pendingBanner');
+      const title = document.getElementById('pendingTitle');
+      const sub = document.getElementById('pendingSub');
+      if (pending.length) {
+        banner.classList.add('active');
+        banner.style.background = '#fffbeb';
+        banner.style.borderColor = '#fde68a';
+        title.textContent = 'Stock request pending approval';
+        title.style.color = '#92400e';
+        sub.textContent = `${pending[0].qty} × ${pending[0].tierLabel || pending[0].tier} — ${formatUGX(pending[0].amount)}. Waiting for master admin to approve.`;
+        sub.style.color = '#78350f';
+      } else if (rejected.length) {
+        banner.classList.add('active');
+        banner.style.background = '#fef2f2';
+        banner.style.borderColor = '#fecaca';
+        title.textContent = 'Stock request rejected';
+        title.style.color = '#991b1b';
+        sub.textContent = `${rejected[0].qty} × ${rejected[0].tierLabel || rejected[0].tier} was rejected. Contact supplier if this is a mistake.`;
+        sub.style.color = '#7f1d1d';
+      } else {
+        banner.classList.remove('active');
+      }
+    }, err => console.error('pending purchases listener error', err));
+}
+
+/* ============ CUSTOMERS (LIVE) ============ */
+let allOrders = [];
+let ordersUnsub = null;
+function watchCustomers() {
+  if (ordersUnsub) ordersUnsub();
+  ordersUnsub = db.collection('orders').orderBy('ts', 'desc').onSnapshot(snap => {
+    allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(o => o.resellerPhone === RESELLER.phone);
+    renderCustomers();
+  }, err => {
+    console.error('orders listener error', err);
+    document.getElementById('custTbody').innerHTML =
+      `<tr><td colspan="7" class="empty">Error loading customers: ${escapeHtml(err.message)}</td></tr>`;
+  });
+}
+
+function renderCustomers() {
+  const q = document.getElementById('custSearch').value.trim().toLowerCase();
+  const ft = document.getElementById('filterTier').value;
+  const rows = allOrders.filter(o => {
+    if (ft && o.tier !== ft) return false;
+    if (q) {
+      const hay = [o.code, o.name, o.phone, o.email, o.txnId].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const tbody = document.getElementById('custTbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty">No customers yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(o => {
+    const statusBadge = o.used
+      ? '<span class="badge badge-used">Checked in</span>'
+      : (o.qrSent ? '<span class="badge badge-unused">QR sent</span>' : '<span class="badge badge-pending">Pending</span>');
+    const wa = normalizePhone(o.phone);
+    return `
+      <tr>
+        <td><span class="cell-code">${escapeHtml(o.code || '—')}</span></td>
+        <td>
+          <div class="cell-name">${escapeHtml(o.name || '—')}</div>
+          <div class="cell-sub">${escapeHtml(o.phone || '')}</div>
+          <div class="cell-sub">${escapeHtml(o.email || '')}</div>
+        </td>
+        <td><span class="badge badge-tier">${escapeHtml(o.tier || '—')}</span></td>
+        <td>${o.qty || 0}</td>
+        <td>${formatUGX(o.total)}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="btn btn-ghost btn-sm" data-qr="${o.id}">QR</button>
+          <a class="btn btn-whatsapp btn-sm" href="https://wa.me/${wa.replace('+','')}?text=${encodeURIComponent(
+            `Hi ${o.name || ''}, thanks for your ticket to Joshua Baraka Pop-Up Party Mbarara!\n\nYour order code is ${o.code}.`
+          )}" target="_blank" rel="noopener">WhatsApp</a>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  tbody.querySelectorAll('[data-qr]').forEach(btn => {
+    btn.addEventListener('click', () => openQrModal(btn.dataset.qr));
+  });
+}
+document.getElementById('custSearch').addEventListener('input', renderCustomers);
+document.getElementById('filterTier').addEventListener('change', renderCustomers);
+
+/* ============ QR MODAL (for customer orders) ============ */
+let currentQrOrder = null;
+const qrModal = document.getElementById('qrModal');
+const qrCanvas = document.getElementById('qrCanvas');
+async function openQrModal(orderId) {
+  const order = allOrders.find(o => o.id === orderId);
+  if (!order) return;
+  currentQrOrder = order;
+  document.getElementById('qrTitle').textContent = `Order ${order.code}`;
+  document.getElementById('qrSub').textContent = `${order.tier} × ${order.qty} — ${order.name}`;
+  document.getElementById('qrCodeText').textContent = order.code;
+  document.getElementById('qrBuyerInfo').textContent = `${order.email} · ${order.phone}`;
+  const payload = JSON.stringify({
+    code: order.code, name: order.name, tier: order.tier, qty: order.qty, ts: order.ts
+  });
+  try { await QRCode.toCanvas(qrCanvas, payload, { width: 240, margin: 1, color: { dark: '#111111', light: '#ffffff' } }); }
+  catch (e) { console.error('QR error', e); }
+  qrModal.classList.add('active');
+}
+document.getElementById('qrClose').addEventListener('click', () => qrModal.classList.remove('active'));
+qrModal.addEventListener('click', (e) => { if (e.target === qrModal) qrModal.classList.remove('active'); });
+document.getElementById('qrDownloadBtn').addEventListener('click', () => {
+  if (!currentQrOrder) return;
+  const url = qrCanvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `QR-${currentQrOrder.code}.png`;
+  a.click();
+});
+document.getElementById('qrWhatsAppBtn').addEventListener('click', () => {
+  if (!currentQrOrder) return;
+  const o = currentQrOrder;
+  const wa = normalizePhone(o.phone).replace('+', '');
+  const msg = `Hi ${o.name},\n\nThank you for buying ${o.qty} × ${o.tier} ticket(s) to *Joshua Baraka Pop-Up Party — Mbarara*!\n\n🎟️ Your order code: *${o.code}*\n📅 Sat 26 Sept 2026 · Nkore Place, Mbarara\n\nPresent the QR code attached at the gate.\n\n— Shooters Events`;
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
+});
+
+/* ============ ADD STOCK ============ */
+const restockModal = document.getElementById('restockModal');
+const numberBox = document.getElementById('numberBox');
+const txnBox = document.getElementById('txnBox');
+const restockActions = document.getElementById('restockActions');
+const step1 = document.getElementById('restockStep1');
+const step2 = document.getElementById('restockStep2');
+const qtySection = document.getElementById('qtySection');
+const paySection = document.getElementById('paySection');
+
+let selectedTier = null;
+let selectedMethod = null;
+let qty = 1;
+
+function openRestock() {
+  selectedTier = null;
+  selectedMethod = null;
+  qty = 1;
+  qtySection.style.display = 'none';
+  paySection.style.display = 'none';
+  numberBox.classList.remove('active');
+  txnBox.classList.remove('active');
+  restockActions.style.display = 'none';
+  document.getElementById('restockUssdSteps').style.display = 'none';
+  document.getElementById('mtnDownNotice').classList.remove('active');
+  document.getElementById('txnInput').value = '';
+  document.querySelectorAll('#tierOptions .tier-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('#restockModal .pay-option').forEach(o => o.classList.remove('selected'));
+  step1.style.display = 'block';
+  step2.classList.remove('active');
+  updateQtyDisplay();
+  restockModal.classList.add('active');
+}
+
+document.getElementById('restockTopBtn').addEventListener('click', openRestock);
+document.getElementById('oosRestockBtn').addEventListener('click', openRestock);
+document.getElementById('restockClose').addEventListener('click', () => restockModal.classList.remove('active'));
+document.getElementById('restockCancelBtn').addEventListener('click', () => restockModal.classList.remove('active'));
+restockModal.addEventListener('click', (e) => { if (e.target === restockModal) restockModal.classList.remove('active'); });
+
+document.querySelectorAll('#tierOptions .tier-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    selectedTier = opt.dataset.tier;
+    document.querySelectorAll('#tierOptions .tier-option').forEach(o => o.classList.toggle('selected', o === opt));
+    qtySection.style.display = 'block';
+    paySection.style.display = 'block';
+    selectedMethod = null;
+    document.querySelectorAll('#restockModal .pay-option').forEach(o => o.classList.remove('selected'));
+    numberBox.classList.remove('active');
+    txnBox.classList.remove('active');
+    restockActions.style.display = 'none';
+    document.getElementById('restockUssdSteps').style.display = 'none';
+    document.getElementById('mtnDownNotice').classList.remove('active');
+    updateAmountDisplay();
+  });
+});
+
+function updateQtyDisplay() {
+  document.getElementById('qtyValue').textContent = qty;
+  document.getElementById('qtyMinus').disabled = qty <= 1;
+  document.getElementById('qtyPlus').disabled = qty >= MAX_QTY;
+  updateAmountDisplay();
+}
+document.getElementById('qtyMinus').addEventListener('click', () => { if (qty > 1) { qty--; updateQtyDisplay(); } });
+document.getElementById('qtyPlus').addEventListener('click', () => { if (qty < MAX_QTY) { qty++; updateQtyDisplay(); } });
+
+function updateAmountDisplay() {
+  if (!selectedTier) return;
+  const total = TIER_PRICES[selectedTier] * qty;
+  document.getElementById('amountDisplay').textContent = formatUGX(total);
+}
+
+document.querySelectorAll('#restockModal .pay-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const method = opt.dataset.method;
+    if (method === 'mtn') {
+      document.getElementById('mtnDownNotice').classList.add('active');
+      document.getElementById('restockUssdSteps').style.display = 'none';
+      numberBox.classList.remove('active');
+      txnBox.classList.remove('active');
+      restockActions.style.display = 'none';
+      document.querySelectorAll('#restockModal .pay-option').forEach(o => o.classList.toggle('selected', o === opt));
+      selectedMethod = null;
+      showToast('MTN is temporarily down');
+      return;
+    }
+    selectedMethod = 'airtel';
+    document.querySelectorAll('#restockModal .pay-option').forEach(o => o.classList.toggle('selected', o === opt));
+    document.getElementById('mtnDownNotice').classList.remove('active');
+    const cfg = SUPPLIER.airtel;
+    document.getElementById('payTillNumber').textContent = cfg.till;
+    document.getElementById('payTillOwner').textContent = cfg.owner;
+    document.getElementById('payTillPhone').textContent = cfg.phone;
+    numberBox.classList.add('active');
+    const total = TIER_PRICES[selectedTier] * qty;
+    const list = document.getElementById('restockUssdList');
+    list.innerHTML = cfg.steps.map((step, i) =>
+      `<li style="display:flex; align-items:flex-start; gap:0.625rem; font-size:0.8125rem; color:#1e3a8a; line-height:1.5;">
+         <span style="flex-shrink:0; width:1.375rem; height:1.375rem; border-radius:50%; background:#1e40af; color:#fff; font-size:0.6875rem; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:0.0625rem;">${i + 1}</span>
+         <span>${step}</span>
+       </li>`
+    ).join('');
+    document.getElementById('restockUssdSteps').style.display = 'block';
+    const amtEl = document.getElementById('instrAmount');
+    if (amtEl) amtEl.textContent = formatUGX(total);
+    txnBox.classList.add('active');
+    restockActions.style.display = 'flex';
+    updateAmountDisplay();
+    setTimeout(() => document.getElementById('txnInput').focus(), 200);
+  });
+});
+
+document.getElementById('copyNumberBtn').addEventListener('click', async () => {
+  const num = SUPPLIER.airtel.till;
+  try { await navigator.clipboard.writeText(num); showToast('Till copied: ' + num); }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = num; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Till copied: ' + num);
+  }
+});
+
+document.getElementById('submitRestockBtn').addEventListener('click', async () => {
+  if (!selectedTier) { showToast('Choose ticket type'); return; }
+  if (selectedMethod !== 'airtel') { showToast('Please use Airtel Money'); return; }
+  const txn = document.getElementById('txnInput').value.trim();
+  if (!txn || txn.length < 4) { showToast('Enter the transaction ID'); return; }
+
+  const unitPrice = TIER_PRICES[selectedTier];
+  const total = unitPrice * qty;
+
+  const btn = document.getElementById('submitRestockBtn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  try {
+    await db.collection('stockPurchases').add({
+      resellerName: RESELLER.name,
+      resellerPhone: RESELLER.phone,
+      supplierName: SUPPLIER.airtel.owner,
+      supplierTill: SUPPLIER.airtel.till,
+      supplierPhone: SUPPLIER.airtel.phone,
+      tier: selectedTier,
+      tierLabel: TIER_LABELS[selectedTier],
+      qty: qty,
+      unitPrice: unitPrice,
+      amount: total,
+      method: 'airtel',
+      txnId: txn,
+      status: 'pending',
+      seenByReseller: false,
+      ts: FV.serverTimestamp()
+    });
+
+    document.getElementById('successTier').textContent = TIER_LABELS[selectedTier];
+    document.getElementById('successQty').textContent = qty;
+    document.getElementById('successOwner').textContent = SUPPLIER.airtel.owner + ' · Till ' + SUPPLIER.airtel.till;
+    document.getElementById('successAmount').textContent = formatUGX(total);
+    document.getElementById('successTxn').textContent = txn;
+
+    step1.style.display = 'none';
+    step2.classList.add('active');
+  } catch (e) {
+    console.error(e);
+    showToast('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit payment';
+  }
+});
+
+document.getElementById('restockDoneBtn').addEventListener('click', () => {
+  restockModal.classList.remove('active');
+  showToast('Stock request submitted');
+});
+
+/* ============ GENERATE TICKETS ============ */
+let genTier = null;
+let genQty = 1;
+
+document.querySelectorAll('#genTierOptions .tier-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    genTier = opt.dataset.tier;
+    document.querySelectorAll('#genTierOptions .tier-option').forEach(o => o.classList.toggle('selected', o === opt));
+    updateGenBtn();
+  });
+});
+
+function updateGenQty() {
+  document.getElementById('genQtyValue').textContent = genQty;
+  document.getElementById('genQtyMinus').disabled = genQty <= 1;
+  document.getElementById('genQtyPlus').disabled = genQty >= MAX_GEN_QTY;
+  updateGenBtn();
+}
+document.getElementById('genQtyMinus').addEventListener('click', () => { if (genQty > 1) { genQty--; updateGenQty(); } });
+document.getElementById('genQtyPlus').addEventListener('click', () => { if (genQty < MAX_GEN_QTY) { genQty++; updateGenQty(); } });
+
+function updateGenBtn() {
+  const btn = document.getElementById('genBtn');
+  btn.disabled = !genTier;
+  btn.innerHTML = genTier
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Generate ${genQty} × ${genTier}`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Generate tickets`;
+}
+
+document.getElementById('genBtn').addEventListener('click', async () => {
+  if (!genTier) { showToast('Choose a ticket type'); return; }
+  const holder = document.getElementById('genHolder').value.trim() || RESELLER.name;
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = 'Generating…';
+
+  try {
+    const batch = db.batch();
+    for (let i = 0; i < genQty; i++) {
+      const code = generateTicketCode();
+      const docRef = db.collection('tickets').doc(code);
+      batch.set(docRef, {
+        code,
+        holder,
+        tier: genTier,
+        qty: 1,
+        resellerPhone: RESELLER.phone,
+        resellerName: RESELLER.name,
+        printed: false,
+        used: false,
+        createdAt: FV.serverTimestamp()
+      });
+    }
+    await batch.commit();
+    showToast(`Generated ${genQty} ticket(s)`);
+    btn.disabled = false;
+    updateGenBtn();
+    document.querySelector('.tab-btn[data-tab="generated"]').click();
+  } catch (e) {
+    console.error(e);
+    showToast('Error: ' + e.message);
+    btn.disabled = false;
+    updateGenBtn();
+  }
+});
+
+/* ============ GENERATED TICKETS LIST ============ */
+let allGenTickets = [];
+let genUnsub = null;
+
+function loadGeneratedTickets() {
+  if (genUnsub) genUnsub();
+  genUnsub = db.collection('tickets')
+    .where('resellerPhone', '==', RESELLER.phone)
+    .orderBy('createdAt', 'desc')
+    .limit(300)
+    .onSnapshot(snap => {
+      allGenTickets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderGeneratedTickets();
+    }, err => {
+      console.error('tickets listener error', err);
+      document.getElementById('genWrap').innerHTML =
+        `<div class="empty">Error loading tickets: ${escapeHtml(err.message)}</div>`;
+    });
+}
+
+function renderGeneratedTickets() {
+  const q = document.getElementById('genSearch').value.trim().toLowerCase();
+  const ft = document.getElementById('genFilterTier').value;
+  const rows = allGenTickets.filter(t => {
+    if (ft && t.tier !== ft) return false;
+    if (q) {
+      const hay = [t.code, t.holder, t.tier].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const wrap = document.getElementById('genWrap');
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="empty">No tickets generated yet. Go to <strong>Generate tickets</strong> to create some.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<div class="tickets-list">${rows.map(t => {
+    const ticketUrl = buildTicketUrl(t);
+    return `
+      <div class="ticket-card">
+        <div class="tc-head">
+          <span class="tc-code">${escapeHtml(t.code)}</span>
+          <span class="tc-tier">${escapeHtml(t.tier)}</span>
+        </div>
+        <div class="tc-holder">${escapeHtml(t.holder)}</div>
+        <div class="tc-sub">${t.used ? 'Checked in' : (t.printed ? 'Sent' : 'Not sent')}</div>
+        <div class="tc-actions">
+          <button class="btn btn-ghost" data-print="${t.id}">Open / Print</button>
+          <a class="btn btn-whatsapp" href="https://wa.me/?text=${encodeURIComponent(buildWhatsAppMessage(t, ticketUrl))}" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+    `;
+  }).join('')}</div>`;
+
+  wrap.querySelectorAll('[data-print]').forEach(b => {
+    b.addEventListener('click', () => {
+      const t = allGenTickets.find(x => x.id === b.dataset.print);
+      if (!t) return;
+      window.open(buildTicketUrl(t), '_blank');
+    });
+  });
+}
+
+function buildTicketUrl(t) {
+  const params = new URLSearchParams({
+    code: t.code,
+    holder: t.holder || 'Guest',
+    tier: t.tier || 'Regular',
+    qty: String(t.qty || 1)
+  });
+  return `${TICKET_BASE_URL}?${params.toString()}`;
+}
+
+function buildWhatsAppMessage(t, url) {
+  return `Hi ${t.holder},
+
+Here is your ticket for *Joshua Baraka Pop-Up Party — Mbarara*!
+
+🎟️ ${t.tier} ticket
+🆔 Code: ${t.code}
+
+Open this link to view and save your ticket (you can print it or show it on your phone):
+${url}
+
+📍 Nkore Place · Sat 26 Sept 2026
+
+— Shooters Events`;
+}
+
+document.getElementById('genSearch').addEventListener('input', renderGeneratedTickets);
+document.getElementById('genFilterTier').addEventListener('change', renderGeneratedTickets);
+
+/* ============ BOOT ============ */
+watchStock();
+watchCustomers();
+watchPendingPurchases();
+</script>
+</body>
+</html>
